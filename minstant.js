@@ -44,7 +44,15 @@ if (Meteor.isClient) {
       getUsername:function(userId){
       user = Meteor.users.findOne({_id:userId});
       return user.profile.username;
-    }
+    },
+	nameDefined:function(userId) {
+		if (Meteor.users.findOne({_id:userId}).profile.username != undefined) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
   })
   Template.available_user_list.helpers({
     users:function(){
@@ -88,14 +96,16 @@ if (Meteor.isClient) {
 	
     if (chat){// ok - we have a chat to use
       var msgs = chat.messages; // pull the messages property
-	  var sentUser = Meteor.users.findOne({_id:Meteor.userId()}).profile.username;
+	  var sentUser = Meteor.userId();
+	  
+	  //Meteor.users.findOne({_id:Meteor.userId()}).profile.username;
       if (!msgs){// no messages yet, create a new array
         msgs = [];
       }
       // is a good idea to insert data straight from the form
       // (i.e. the user) into the database?? certainly not. 
       // push adds the message to the end of the array
-      msgs.push({text: event.target.chat.value}, {sentUser});
+      msgs.push({sentUser,text: event.target.chat.value});
       // reset the form
       event.target.chat.value = "";
       // put the messages array onto the chat object

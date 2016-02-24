@@ -90,7 +90,12 @@
 
 <!-- simple template that displays a message -->
 <template name="chat_message">
-	{{sentUser}} said: {{text}}
+	{{#if nameDefined sentUser }}
+		{{getUsername sentUser}} said: {{text}}
+		
+	{{else}}
+		someone said: {{text}}
+	{{/if}}
 	<br>
 </template>
 
