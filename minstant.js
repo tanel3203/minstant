@@ -1,5 +1,25 @@
 Chats = new Mongo.Collection("chats");
 
+Chats.allow({
+	insert:function(user) {
+		if (Meteor.user()) { //person is logged in
+			return true;
+		} else {// not logged in
+			return false;
+		}
+	},
+	update:function(chatId, chat) {
+		if (Meteor.user()) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+})
+
+
 if (Meteor.isClient) {
   // set up the main template the the router will use to build pages
   Router.configure({
@@ -116,7 +136,7 @@ if (Meteor.isClient) {
       // put the messages array onto the chat object
       chat.messages = msgs;
       // update the chat object in the database.
-      Chats.update(chat._id, chat);
+      Chats.update({_id:chat._id},{$set: {messages:msgs}});
     }
   }
  })
