@@ -45,6 +45,10 @@ if (Meteor.isClient) {
       user = Meteor.users.findOne({_id:userId});
       return user.profile.username;
     },
+	getUserAvatar:function(userId){
+      user = Meteor.users.findOne({_id:userId});
+      return user.profile.avatar;
+    }, 
 	nameDefined:function(userId) {
 		if (Meteor.users.findOne({_id:userId}).profile.username != undefined) {
 			return true;
@@ -63,7 +67,8 @@ if (Meteor.isClient) {
     getUsername:function(userId){
       user = Meteor.users.findOne({_id:userId});
       return user.profile.username;
-    }, 
+    },
+
     isMyUser:function(userId){
       if (userId == Meteor.userId()){
         return true;

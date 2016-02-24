@@ -91,10 +91,26 @@
 <!-- simple template that displays a message -->
 <template name="chat_message">
 	{{#if nameDefined sentUser }}
-		{{getUsername sentUser}} said: {{text}}
+		<div class="row">
+		<hr>
+			<div class="col-md-2">
+				<img src="/{{getUserAvatar sentUser}}" class="avatar_img">
+			</div>
+			<div class="col-md-10">
+				{{getUsername sentUser}} said: {{text}}
+			</div>
+		 </div>
 		
 	{{else}}
-		someone said: {{text}}
+		<div class="row">
+		<hr>
+			<div class="col-md-2">
+				<div  class="avatar_img"></div>
+			</div>
+			<div class="col-md-10">
+			someone said: {{text}}
+			</div>
+		</div>
 	{{/if}}
 	<br>
 </template>
