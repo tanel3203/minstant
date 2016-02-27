@@ -1,13 +1,19 @@
 
-
 Chats.allow({
-	insert:function(user) {
+
+/*
+	insert:function(user, doc) {
 		if (Meteor.user()) { //person is logged in
-			return true;
+			if (doc.owner == user) {
+			return (Meteor.user()._id == user);
+			}
+			else {
+				return false;
+			}
 		} else {// not logged in
 			return false;
 		}
-	},
+	},*/
 	update:function(chatId, chat) {
 		if (Meteor.user()) {
 			return true;
@@ -19,6 +25,10 @@ Chats.allow({
 	
 })
 
+Meteor.methods({
+  newPost: function (post) {
+    Chats.insert(post);
+  }})
 
 if (Meteor.isClient) {
   // set up the main template the the router will use to build pages
@@ -45,7 +55,8 @@ if (Meteor.isClient) {
                 ]};
     var chat = Chats.findOne(filter);
     if (!chat){// no chat matching the filter - need to insert a new one
-      chatId = Chats.insert({user1Id:Meteor.userId(), user2Id:otherUserId});
+      chatId = Meteor.call('newPost',{user1Id:Meteor.userId(), user2Id:otherUserId});
+	  //chatId = Chats.insert({user1Id:Meteor.userId(), user2Id:otherUserId});
     }
     else {// there is a chat going already - use that. 
       chatId = chat._id;
@@ -69,7 +80,19 @@ if (Meteor.isClient) {
       user = Meteor.users.findOne({_id:userId});
       return user.profile.avatar;
     }, 
+	getUserImage:function(userId){
+      user = Meteor.users.findOne({_id:userId});
+      return user.profile.src;
+    },
 	nameDefined:function(userId) {
+		if (Meteor.users.findOne({_id:userId}).profile.username != undefined) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	},
+	imageDefined:function(userId) {
 		if (Meteor.users.findOne({_id:userId}).profile.username != undefined) {
 			return true;
 		}
@@ -111,36 +134,59 @@ if (Meteor.isClient) {
 
   })
  Template.chat_page.events({
+  'click .js-smile':function(event) {
+  
+	var content = document.getElementById("content");
+	
+	var image_node = document.createElement("img");
+	image_node.src = event.target.src;
+	image_node.className += " avatar_img";
+	content.lastChild.parentNode.appendChild(image_node);
+	
+	var chat = Chats.findOne({_id:Session.get("chatId")});
+	if (chat){// ok - we have a chat to use
+		var msgs = chat.messages; // pull the messages property
+		if (!msgs){// no messages yet, create a new array
+			msgs = [];
+		}
+		msgs.push({src});
+		chat.messages = msgs;
+		Chats.update({_id:chat._id},{$set: {messages:msgs}});
+	}
+  },
   // this event fires when the user sends a message on the chat page
   'submit .js-send-chat':function(event){
     // stop the form from triggering a page reload
     event.preventDefault();
-    // see if we can find a chat object in the database
-    // to which we'll add the message
-    var chat = Chats.findOne({_id:Session.get("chatId")});
+
 	
-    if (chat){// ok - we have a chat to use
-      var msgs = chat.messages; // pull the messages property
-	  var sentUser = Meteor.userId();
-	  
-	  //Meteor.users.findOne({_id:Meteor.userId()}).profile.username;
-      if (!msgs){// no messages yet, create a new array
-        msgs = [];
-      }
-      // is a good idea to insert data straight from the form
-      // (i.e. the user) into the database?? certainly not. 
-      // push adds the message to the end of the array
-      msgs.push({sentUser,text: event.target.chat.value});
-      // reset the form
-      event.target.chat.value = "";
-      // put the messages array onto the chat object
-      chat.messages = msgs;
-      // update the chat object in the database.
-      Chats.update({_id:chat._id},{$set: {messages:msgs}});
-    }
+			// see if we can find a chat object in the database
+			// to which we'll add the message
+			var chat = Chats.findOne({_id:Session.get("chatId")});
+			
+			if (chat){// ok - we have a chat to use
+			  var msgs = chat.messages; // pull the messages property
+			  var sentUser = Meteor.userId();
+			  
+			  //Meteor.users.findOne({_id:Meteor.userId()}).profile.username;
+			  if (!msgs){// no messages yet, create a new array
+				msgs = [];
+			  }
+			  // is a good idea to insert data straight from the form
+			  // (i.e. the user) into the database?? certainly not. 
+			  // push adds the message to the end of the array
+			  msgs.push({sentUser,text: event.target.chat.value.replace("yay","<iframe src=\"pos.png\"></iframe>")});
+			  // reset the form
+			  event.target.chat.value = "";
+			  // put the messages array onto the chat object
+			  chat.messages = msgs;
+			  // update the chat object in the database.
+			  Chats.update({_id:chat._id},{$set: {messages:msgs}});
+			}
+	
   }
  })
-}
+} // / isClient
 
 
 // start up script that creates some users for testing

@@ -84,6 +84,9 @@
 			<input class="input" type="text" name="chat" placeholder="type a message here...">
 			<button class="btn btn-default">send</button>
 		</form>
+		
+			<img src="/pos.png" class="js-smile avatar_img">
+			<img src="/happy.png" class="js-smile avatar_img">
 		</div>
 	</div>
 </template>
@@ -96,8 +99,9 @@
 			<div class="col-md-2">
 				<img src="/{{getUserAvatar sentUser}}" class="avatar_img">
 			</div>
-			<div class="col-md-10">
+			<div id="content" class="col-md-10">
 				{{getUsername sentUser}} said: {{text}}
+				
 			</div>
 		 </div>
 		
@@ -107,7 +111,7 @@
 			<div class="col-md-2">
 				<div  class="avatar_img"></div>
 			</div>
-			<div class="col-md-10">
+			<div id="content" class="col-md-10">
 			someone said: {{text}}
 			</div>
 		</div>
